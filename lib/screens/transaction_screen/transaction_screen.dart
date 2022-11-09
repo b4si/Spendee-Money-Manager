@@ -18,7 +18,8 @@ class TransactionScreenState extends State<TransactionScreen> {
       TransactionDB.instance.transactionListNotifier.value;
 
   List<TransactionModel> foundTransactions = [];
-  List<TransactionModel> dateRangetansactions = [];
+  ValueNotifier<List<TransactionModel>> dateRangetansactions =
+      ValueNotifier([]);
   @override
   void initState() {
     foundTransactions = transactions;
@@ -91,8 +92,15 @@ class TransactionScreenState extends State<TransactionScreen> {
                     child: const Text('All'),
                     onTap: () {
                       setState(() {
-                        _value2 = 1;
-                        foundTransactions = transactions;
+                        if (_value2 == 1) {
+                          foundTransactions = transactions;
+                        } else if (_value2 == 2) {
+                          foundTransactions = TransactionDB
+                              .instance.todayTransactionNotifier.value;
+                        } else if (_value2 == 3) {
+                          foundTransactions = TransactionDB
+                              .instance.monthlyTransactionNotifier.value;
+                        }
                       });
                     },
                   ),
@@ -101,9 +109,16 @@ class TransactionScreenState extends State<TransactionScreen> {
                     child: const Text('Income'),
                     onTap: () {
                       setState(() {
-                        _value2 = 1;
-                        foundTransactions = TransactionDB
-                            .instance.incomeTransactionNotifier.value;
+                        if (_value2 == 1) {
+                          foundTransactions = TransactionDB
+                              .instance.incomeTransactionNotifier.value;
+                        } else if (_value2 == 2) {
+                          foundTransactions =
+                              TransactionDB.instance.todayIncomeList.value;
+                        } else if (_value2 == 3) {
+                          foundTransactions = TransactionDB
+                              .instance.allMonthlyincomeTransactions.value;
+                        }
                       });
                     },
                   ),
@@ -112,9 +127,16 @@ class TransactionScreenState extends State<TransactionScreen> {
                     child: const Text('Expense'),
                     onTap: () {
                       setState(() {
-                        _value2 = 1;
-                        foundTransactions = TransactionDB
-                            .instance.expenseTransactionNotifier.value;
+                        if (_value2 == 1) {
+                          foundTransactions = TransactionDB
+                              .instance.expenseTransactionNotifier.value;
+                        } else if (_value2 == 2) {
+                          foundTransactions =
+                              TransactionDB.instance.todayExpenseList.value;
+                        } else if (_value2 == 3) {
+                          foundTransactions = TransactionDB
+                              .instance.allMonthlyExpenseTransactions.value;
+                        }
                       });
                     },
                   ),
@@ -141,8 +163,15 @@ class TransactionScreenState extends State<TransactionScreen> {
                     child: const Text('All'),
                     onTap: () {
                       setState(() {
-                        _value4 = 1;
-                        foundTransactions = transactions;
+                        if (_value4 == 1) {
+                          foundTransactions = transactions;
+                        } else if (_value4 == 2) {
+                          foundTransactions = TransactionDB
+                              .instance.incomeTransactionNotifier.value;
+                        } else if (_value4 == 3) {
+                          foundTransactions = TransactionDB
+                              .instance.expenseTransactionNotifier.value;
+                        }
                       });
                     },
                   ),
@@ -151,9 +180,16 @@ class TransactionScreenState extends State<TransactionScreen> {
                     child: const Text('Today'),
                     onTap: () {
                       setState(() {
-                        _value4 = 1;
-                        foundTransactions = TransactionDB
-                            .instance.todayTransactionNotifier.value;
+                        if (_value4 == 1) {
+                          foundTransactions = TransactionDB
+                              .instance.todayTransactionNotifier.value;
+                        } else if (_value4 == 2) {
+                          foundTransactions =
+                              TransactionDB.instance.todayIncomeList.value;
+                        } else if (_value4 == 3) {
+                          foundTransactions =
+                              TransactionDB.instance.todayExpenseList.value;
+                        }
                       });
                     },
                   ),
@@ -163,19 +199,18 @@ class TransactionScreenState extends State<TransactionScreen> {
                       'Monthly',
                     ),
                     onTap: () {
-                      _value4 = 1;
-
-                      foundTransactions = TransactionDB
-                          .instance.monthlyTransactionNotifier.value;
-                    },
-                  ),
-                  DropdownMenuItem(
-                    value: 4,
-                    child: const Text('Yearly'),
-                    onTap: () {
-                      _value4 = 1;
-                      foundTransactions = TransactionDB
-                          .instance.yearlyTransactionNotifier.value;
+                      setState(() {
+                        if (_value4 == 1) {
+                          foundTransactions = TransactionDB
+                              .instance.monthlyTransactionNotifier.value;
+                        } else if (_value4 == 2) {
+                          foundTransactions = TransactionDB
+                              .instance.allMonthlyincomeTransactions.value;
+                        } else if (_value4 == 3) {
+                          foundTransactions = TransactionDB
+                              .instance.allMonthlyExpenseTransactions.value;
+                        }
+                      });
                     },
                   ),
                 ],
@@ -322,40 +357,33 @@ class TransactionScreenState extends State<TransactionScreen> {
       firstDate: DateTime(2021),
       lastDate: DateTime(2050),
     );
-    if (newDateRange == null) {
-      return;
-    } else {
+
+    if (newDateRange != null) {
       for (int i = 0; i < transactions.length; i++) {
         if (transactions[i].date.isAfter(newDateRange.start) &&
             transactions[i].date.isBefore(newDateRange.end)) {
-          dateRangetansactions = transactions;
+          dateRangetansactions.value.addAll(transactions);
+        } else {
+          return ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              behavior: SnackBarBehavior.floating,
+              margin: EdgeInsets.all(20),
+              backgroundColor: Colors.red,
+              content: Text(
+                "No Transaction found on this Date range",
+              ),
+            ),
+          );
         }
+        print(dateRangetansactions.value[i].date);
       }
+    } else {
+      return;
     }
-    print(dateRangetansactions);
-    return showModalBottomSheet(
-      context: context,
-      builder: ((context) {
-        return ListView.separated(
-            itemBuilder: ((context, index) {
-              return ListTile(
-                title: Text(
-                  dateRangetansactions[index].category.name,
-                ),
-                subtitle: Text(
-                  parseDate(dateRangetansactions[index].date),
-                ),
-                trailing: Text(
-                  dateRangetansactions[index].amount.toString(),
-                ),
-              );
-            }),
-            separatorBuilder: ((context, index) {
-              return const Divider();
-            }),
-            itemCount: dateRangetansactions.length);
-      }),
-    );
+
+    setState(() {
+      foundTransactions = dateRangetansactions.value;
+    });
   }
 }
 
