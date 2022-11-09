@@ -1,11 +1,20 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:money_manager/db/category_db/category_db.dart';
 import 'package:money_manager/db/transaction_db/transaction_db.dart';
-import 'package:money_manager/screens/settings_screen/terms_and_conditions.dart';
 import 'package:money_manager/screens/splash_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  // final Uri _url = Uri.parse('https://flutter.dev');
 
   @override
   Widget build(BuildContext context) {
@@ -15,13 +24,7 @@ class SettingsScreen extends StatelessWidget {
           ListTile(
             title: const Text('Terms and Conditions'),
             onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: ((context) {
-                    return const TermsAndConditions();
-                  }),
-                ),
-              );
+              _launchURL();
             },
           ),
           ListTile(
@@ -82,5 +85,13 @@ class SettingsScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _launchURL() async {
+    const url =
+        'https://www.blogger.com/blog/post/edit/4259005576302968234/5321993022519999238';
+    if (await launch(url)) {
+      await canLaunch(url);
+    }
   }
 }
