@@ -88,8 +88,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _launchURL() async {
-    const url =
-        'https://www.blogger.com/blog/post/edit/4259005576302968234/5321993022519999238';
+    const url = 'https://b4si.github.io/Terms-And-Conditions/';
     if (await launch(url)) {
       await canLaunch(url);
     }

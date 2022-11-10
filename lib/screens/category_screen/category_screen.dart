@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager/db/category_db/category_db.dart';
-import '../catagory_model/category_model.dart';
+import '../../catagory_model/category_model.dart';
 
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({super.key});

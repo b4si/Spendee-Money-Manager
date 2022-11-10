@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager/db/category_db/category_db.dart';
 import 'package:money_manager/db/transaction_db/transaction_db.dart';
-import 'package:money_manager/screens/category_screen.dart';
+import 'package:money_manager/screens/category_screen/category_screen.dart';
 import 'package:money_manager/screens/home_screen/monthly_card_widget.dart';
 import 'package:money_manager/screens/home_screen/recent_list.dart';
 import 'package:money_manager/screens/settings_screen/settings_screen.dart';
