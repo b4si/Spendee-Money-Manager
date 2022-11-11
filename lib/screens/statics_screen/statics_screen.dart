@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:money_manager/screens/settings_screen/settings_screen.dart';
 import 'package:money_manager/screens/statics_screen/all_expense_chart.dart';
 import 'package:money_manager/screens/statics_screen/all_income_chart.dart';
 import 'package:money_manager/screens/statics_screen/all_income_expense_chart.dart';
@@ -13,15 +12,6 @@ class StaticsScreen extends StatefulWidget {
 
 class _StaticsScreenState extends State<StaticsScreen>
     with SingleTickerProviderStateMixin {
-  // List<Color> colorList = [
-  //   Colors.red,
-  //   Colors.greenAccent,
-  //   Colors.blue,
-  //   Colors.yellow,
-  //   Colors.purpleAccent,
-  //   Colors.brown,
-  // ];
-
   late TabController newTabcontroller;
   @override
   void initState() {

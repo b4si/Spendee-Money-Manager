@@ -363,14 +363,14 @@ class TransactionScreenState extends State<TransactionScreen> {
     if (newDateRange == null) {
       return;
     } else {
-      startDate = newDateRange.start;
-      endDate = newDateRange.end;
+      startDate = await newDateRange.start;
+      endDate = await newDateRange.end;
     }
   }
 }
 
-late DateTime startDate;
-late DateTime endDate;
+DateTime startDate = DateTime.now();
+DateTime endDate = DateTime.now();
 
 String parseDate(DateTime date) {
   return '${date.day}/${date.month}/${date.year}';

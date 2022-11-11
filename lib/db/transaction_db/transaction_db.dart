@@ -113,7 +113,7 @@ class TransactionDB implements TransactionDbFunctions {
     );
     monthlyTransactionNotifier.notifyListeners();
 
-    //for getting all monthly incomes-------->
+    //for getting all monthly incomes list-------->
     allMonthlyincomeTransactions.value.clear();
     await Future.forEach(
       _list,
@@ -126,7 +126,7 @@ class TransactionDB implements TransactionDbFunctions {
     );
     allMonthlyincomeTransactions.notifyListeners();
 
-    //for getting all monthly expenses------->
+    //for getting all monthly expenses list------->
     allMonthlyExpenseTransactions.value.clear();
     await Future.forEach(
       _list,
@@ -139,7 +139,7 @@ class TransactionDB implements TransactionDbFunctions {
     );
     allMonthlyExpenseTransactions.notifyListeners();
 
-    //for getting todays income--------->
+    //for getting todays income list--------->
 
     todayIncomeList.value.clear();
 
@@ -158,7 +158,7 @@ class TransactionDB implements TransactionDbFunctions {
     );
     todayIncomeList.notifyListeners();
 
-//for getting todays expense--------->
+//for getting todays expense list--------->
 
     todayExpenseList.value.clear();
     await Future.forEach(
@@ -175,6 +175,8 @@ class TransactionDB implements TransactionDbFunctions {
       },
     );
     todayExpenseList.notifyListeners();
+
+    //for getting date range list--------->
 
     dateRangeList.value.clear();
     await Future.forEach(

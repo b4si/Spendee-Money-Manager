@@ -98,7 +98,9 @@ class _PieCahrtState extends State<PieCahrt> {
             },
           ),
         ),
+
         //All income and expense pie chart-------->
+
         Expanded(
             child: totalIncomeAmount != 0
                 ? PieChart(
