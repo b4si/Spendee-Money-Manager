@@ -3,10 +3,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:money_manager/screens/transaction_screen/transaction_screen.dart';
 import 'package:money_manager/transaction_model/transaction_model.dart';
-
 import '../../catagory_model/category_model.dart';
-import '../../screens/form_screen/form_screen.dart';
 
 const transactionDbName = 'transaction-db';
 
@@ -43,6 +42,7 @@ class TransactionDB implements TransactionDbFunctions {
       ValueNotifier([]);
   ValueNotifier<List<TransactionModel>> todayIncomeList = ValueNotifier([]);
   ValueNotifier<List<TransactionModel>> todayExpenseList = ValueNotifier([]);
+  ValueNotifier<List<TransactionModel>> dateRangeList = ValueNotifier([]);
 
   @override
   Future<void> addTransaction(TransactionModel obj) async {
@@ -175,6 +175,20 @@ class TransactionDB implements TransactionDbFunctions {
       },
     );
     todayExpenseList.notifyListeners();
+
+    dateRangeList.value.clear();
+    await Future.forEach(
+      _list,
+      (TransactionModel transaction) {
+        if (transaction.date.isAfter(startDate.subtract(Duration(days: 1))) &&
+            transaction.date.isBefore(endDate.add(Duration(days: 1)))) {
+          dateRangeList.value.add(transaction);
+        } else {
+          return;
+        }
+      },
+    );
+    dateRangeList.notifyListeners();
   }
 
   //Function for Getting Total balance------->

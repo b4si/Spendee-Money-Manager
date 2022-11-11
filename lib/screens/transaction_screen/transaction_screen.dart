@@ -18,8 +18,7 @@ class TransactionScreenState extends State<TransactionScreen> {
       TransactionDB.instance.transactionListNotifier.value;
 
   List<TransactionModel> foundTransactions = [];
-  ValueNotifier<List<TransactionModel>> dateRangetansactions =
-      ValueNotifier([]);
+
   @override
   void initState() {
     foundTransactions = transactions;
@@ -58,16 +57,19 @@ class TransactionScreenState extends State<TransactionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // actions: [
-        //   IconButton(
-        //     onPressed: () {
-        //       pickDateRange();
-        //     },
-        //     icon: const Icon(
-        //       Icons.calendar_month,
-        //     ),
-        //   ),
-        // ],
+        actions: [
+          IconButton(
+            onPressed: () {
+              setState(() {
+                pickDateRange().whenComplete(() => foundTransactions =
+                    TransactionDB.instance.dateRangeList.value);
+              });
+            },
+            icon: const Icon(
+              Icons.calendar_month,
+            ),
+          ),
+        ],
         centerTitle: true,
         title: const Text('Transactions'),
         backgroundColor: const Color(0xFF15485D),
@@ -351,41 +353,24 @@ class TransactionScreenState extends State<TransactionScreen> {
     );
   }
 
-  // Future pickDateRange() async {
-  //   DateTimeRange? newDateRange = await showDateRangePicker(
-  //     context: context,
-  //     firstDate: DateTime(2021),
-  //     lastDate: DateTime(2050),
-  //   );
+  Future pickDateRange() async {
+    DateTimeRange? newDateRange = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2021),
+      lastDate: DateTime(2050),
+    );
 
-  //   if (newDateRange != null) {
-  //     for (int i = 0; i < transactions.length; i++) {
-  //       if (transactions[i].date.isAfter(newDateRange.start) &&
-  //           transactions[i].date.isBefore(newDateRange.end)) {
-  //         dateRangetansactions.value.addAll(transactions);
-  //       } else {
-  //         return ScaffoldMessenger.of(context).showSnackBar(
-  //           const SnackBar(
-  //             behavior: SnackBarBehavior.floating,
-  //             margin: EdgeInsets.all(20),
-  //             backgroundColor: Colors.red,
-  //             content: Text(
-  //               "No Transaction found on this Date range",
-  //             ),
-  //           ),
-  //         );
-  //       }
-  //       print(dateRangetansactions.value[i].date);
-  //     }
-  //   } else {
-  //     return;
-  //   }
-
-  //   setState(() {
-  //     foundTransactions = dateRangetansactions.value;
-  //   });
-  // }
+    if (newDateRange == null) {
+      return;
+    } else {
+      startDate = newDateRange.start;
+      endDate = newDateRange.end;
+    }
+  }
 }
+
+late DateTime startDate;
+late DateTime endDate;
 
 String parseDate(DateTime date) {
   return '${date.day}/${date.month}/${date.year}';
