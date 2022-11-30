@@ -6,16 +6,8 @@ import 'package:money_manager/db/transaction_db/transaction_db.dart';
 import 'package:money_manager/screens/splash_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
-
-  @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
-}
-
-class _SettingsScreenState extends State<SettingsScreen> {
-  // final Uri _url = Uri.parse('https://flutter.dev');
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
