@@ -8,7 +8,7 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SplashScreenView(
-      navigateRoute: const HomeScreen(),
+      navigateRoute: HomeScreen(),
       duration: 4000,
       imageSize: 310,
       imageSrc: "assets\\SPENDEE.png",

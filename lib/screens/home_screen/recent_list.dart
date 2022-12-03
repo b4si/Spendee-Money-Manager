@@ -81,7 +81,7 @@ class RecentTransactions extends StatelessWidget {
                     onPressed: (() {
                       Navigator.of(context)
                           .push(MaterialPageRoute(builder: ((context) {
-                        return const FormScreen();
+                        return FormScreen();
                       })));
                     }),
                     backgroundColor: const Color(0xFF15485D),

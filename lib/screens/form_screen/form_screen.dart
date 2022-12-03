@@ -1,51 +1,24 @@
-// ignore_for_file: no_leading_underscores_for_local_identifiers
+// ignore_for_file: no_leading_underscores_for_local_identifiers, must_be_immutable
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:money_manager/application/formScreenProvider.dart';
 import 'package:money_manager/db/category_db/category_db.dart';
 import 'package:money_manager/db/transaction_db/transaction_db.dart';
 import 'package:money_manager/transaction_model/transaction_model.dart';
+import 'package:provider/provider.dart';
 import '../../catagory_model/category_model.dart';
 import 'radio_button.dart';
 
-class FormScreen extends StatefulWidget {
-  const FormScreen({super.key});
-
-  @override
-  State<FormScreen> createState() => _FormScreenState();
-}
-
-ValueNotifier<CategoryType> selectedCategoryNotifier =
-    ValueNotifier(CategoryType.income);
-
-ValueNotifier<List<TransactionModel>> transactions =
-    TransactionDB.instance.transactionListNotifier;
-
-List<CategoryModel> incCategories =
-    CategoryDB.instance.incomeCategoryListNotifier.value;
-
-List<CategoryModel> expCategories =
-    CategoryDB.instance.expenseCategoryListNotifier.value;
-
-final _formKey = GlobalKey<FormState>();
-
-class _FormScreenState extends State<FormScreen> {
-  String? _categoryID;
-  DateTime? _selectedDate;
-  CategoryType? _selectedCategorytype;
-  CategoryModel? _selectedCategoryModel;
-
-  @override
-  void initState() {
-    _selectedCategorytype = CategoryType.income;
-    super.initState();
-  }
+class FormScreen extends StatelessWidget {
+  FormScreen({super.key});
 
   TextEditingController amountController = TextEditingController();
   final nameEditingController = TextEditingController();
   TextEditingController notesController = TextEditingController();
   final incomeCategoryList = CategoryDB().incomeCategoryListNotifier.value;
   final expenseCategoryList = CategoryDB().expenseCategoryListNotifier.value;
+
   @override
   Widget build(BuildContext context) {
     CategoryDB.instance.refreshUI();
@@ -68,75 +41,83 @@ class _FormScreenState extends State<FormScreen> {
 
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Row(
-                        children: [
-                          Radio(
-                            value: CategoryType.income,
-                            groupValue: _selectedCategorytype,
-                            onChanged: (newValue) {
-                              setState(() {
-                                _selectedCategorytype = CategoryType.income;
-                                _categoryID = null;
-                              });
-                            },
-                          ),
-                          const Text('Income')
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Radio(
-                            value: CategoryType.expense,
-                            groupValue: _selectedCategorytype,
-                            onChanged: (newValue) {
-                              setState(() {
-                                _selectedCategorytype = CategoryType.expense;
-                                _categoryID = null;
-                              });
-                            },
-                          ),
-                          const Text('Expense'),
-                        ],
-                      )
-                    ],
+                  Consumer<FromScreenProvider>(
+                    builder: (context, value, child) => Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Row(
+                          children: [
+                            Radio(
+                              value: CategoryType.income,
+                              groupValue: value.selectedCategorytype,
+                              onChanged: (newValue) {
+                                Provider.of<FromScreenProvider>(
+                                  context,
+                                  listen: false,
+                                ).incomeRadioButton();
+                                value.categoryID = null;
+                              },
+                            ),
+                            const Text('Income')
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Radio(
+                              value: CategoryType.expense,
+                              groupValue: value.selectedCategorytype,
+                              onChanged: (newValue) {
+                                Provider.of<FromScreenProvider>(
+                                  context,
+                                  listen: false,
+                                ).expenseRadioButton();
+                                value.categoryID = null;
+                              },
+                            ),
+                            const Text('Expense'),
+                          ],
+                        )
+                      ],
+                    ),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       //Dropdown for selecting the category----->
 
-                      DropdownButton<String>(
-                        elevation: 1,
-                        underline: Container(),
-                        dropdownColor: Colors.blueGrey[100],
-                        value: _categoryID,
-                        hint: const Text('Select category'),
-                        items: (_selectedCategorytype == CategoryType.income
-                                ? CategoryDB().incomeCategoryListNotifier
-                                : CategoryDB().expenseCategoryListNotifier)
-                            .value
-                            .map(
-                          (e) {
-                            return DropdownMenuItem(
-                              value: e.id,
-                              child: Text(e.name),
-                              onTap: () {
-                                _selectedCategoryModel = e;
-                              },
-                            );
-                          },
-                        ).toList(),
-                        onChanged: (selectedValue) {
-                          setState(
-                            () {
-                              _categoryID = selectedValue;
+                      Consumer<FromScreenProvider>(
+                        builder: (context, value, child) =>
+                            DropdownButton<String>(
+                          elevation: 1,
+                          underline: Container(),
+                          dropdownColor: Colors.blueGrey[100],
+                          value: value.categoryID,
+                          hint: const Text('Select category'),
+                          items: (value.selectedCategorytype ==
+                                      CategoryType.income
+                                  ? CategoryDB().incomeCategoryListNotifier
+                                  : CategoryDB().expenseCategoryListNotifier)
+                              .value
+                              .map(
+                            (e) {
+                              return DropdownMenuItem(
+                                value: e.id,
+                                child: Text(e.name),
+                                onTap: () {
+                                  value.selectedCategoryModel = e;
+                                },
+                              );
                             },
-                          );
-                        },
-                        onTap: () {},
+                          ).toList(),
+                          onChanged: (selectedValue) {
+                            Provider.of<FromScreenProvider>(
+                              context,
+                              listen: false,
+                            ).changeCategoryList(selectedValue);
+                            ;
+                          },
+                          onTap: () {},
+                        ),
                       ),
                       IconButton(
 
@@ -218,7 +199,7 @@ class _FormScreenState extends State<FormScreen> {
                                             MainAxisAlignment.spaceEvenly,
                                         children: [
                                           Row(
-                                            children: const [
+                                            children: [
                                               RadioButton(
                                                 title: 'Income',
                                                 type: CategoryType.income,
@@ -226,7 +207,7 @@ class _FormScreenState extends State<FormScreen> {
                                             ],
                                           ),
                                           Row(
-                                            children: const [
+                                            children: [
                                               RadioButton(
                                                 title: 'Expense',
                                                 type: CategoryType.expense,
@@ -255,10 +236,12 @@ class _FormScreenState extends State<FormScreen> {
                                             );
                                             CategoryDB()
                                                 .insertCategory(category);
+                                            Provider.of<FromScreenProvider>(
+                                                    context,
+                                                    listen: false)
+                                                .refreshUI();
                                             Navigator.of(context).pop();
-                                            setState(() {
-                                              CategoryDB.instance.refreshUI();
-                                            });
+
                                             nameEditingController.clear();
                                           }
                                         },
@@ -327,28 +310,31 @@ class _FormScreenState extends State<FormScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        TextButton.icon(
-                          onPressed: () async {
-                            final selectedDateTemp = await showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime.now()
-                                  .subtract(const Duration(days: 60)),
-                              lastDate: DateTime.now(),
-                            );
-                            if (selectedDateTemp == null) {
-                              return;
-                            } else {
-                              setState(() {
-                                _selectedDate = selectedDateTemp;
-                              });
-                            }
-                          },
-                          icon: const Icon(Icons.calendar_month),
-                          label: Text(
-                            _selectedDate == null
-                                ? 'Select date'
-                                : ('${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}'),
+                        Consumer<FromScreenProvider>(
+                          builder: (context, value, child) => TextButton.icon(
+                            onPressed: () async {
+                              final selectedDateTemp = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime.now()
+                                    .subtract(const Duration(days: 60)),
+                                lastDate: DateTime.now(),
+                              );
+                              if (selectedDateTemp == null) {
+                                return;
+                              } else {
+                                Provider.of<FromScreenProvider>(
+                                  context,
+                                  listen: false,
+                                ).setDate(selectedDateTemp);
+                              }
+                            },
+                            icon: const Icon(Icons.calendar_month),
+                            label: Text(
+                              value.selectedDate == null
+                                  ? 'Select date'
+                                  : ('${value.selectedDate!.day}/${value.selectedDate!.month}/${value.selectedDate!.year}'),
+                            ),
                           ),
                         ),
                       ],
@@ -361,15 +347,24 @@ class _FormScreenState extends State<FormScreen> {
                     padding: const EdgeInsets.only(left: 16, right: 16),
                     child: SizedBox(
                       width: double.infinity,
-                      child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(),
-                          onPressed: () {
-                            checkAmount();
-                            setState(() {
-                              TransactionDB.instance.refresh();
-                            });
-                          },
-                          child: const Text('Submit')),
+                      child: Consumer<FromScreenProvider>(
+                        builder: (context, value, child) => ElevatedButton(
+                            style: ElevatedButton.styleFrom(),
+                            onPressed: () {
+                              checkAmount(
+                                context,
+                              );
+                              Provider.of<FromScreenProvider>(
+                                context,
+                                listen: false,
+                              ).refreshTransactionList();
+                              value.categoryID = null;
+                              amountController.clear();
+                              notesController.clear();
+                              value.selectedDate = null;
+                            },
+                            child: const Text('Submit')),
+                      ),
                     ),
                   )
                 ],
@@ -383,10 +378,12 @@ class _FormScreenState extends State<FormScreen> {
 
   //Function for checking and adding Transactions------>
 
-  void checkAmount() {
+  void checkAmount(context) {
     final amountCheck = amountController.text.trim();
-    final dateCheck = _selectedDate;
-    if (_categoryID == null) {
+    final dateCheck =
+        Provider.of<FromScreenProvider>(context, listen: false).selectedDate;
+    if (Provider.of<FromScreenProvider>(context, listen: false).categoryID ==
+        null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           behavior: SnackBarBehavior.floating,
@@ -414,7 +411,7 @@ class _FormScreenState extends State<FormScreen> {
         ),
       );
     } else {
-      addtransaction();
+      addtransaction(context);
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -429,9 +426,10 @@ class _FormScreenState extends State<FormScreen> {
 
   //Function for adding transaction----->
 
-  Future<void> addtransaction() async {
+  Future<void> addtransaction(context) async {
     final _amountText = amountController.text;
-    final _date = _selectedDate;
+    final _date =
+        Provider.of<FromScreenProvider>(context, listen: false).selectedDate;
     final _notes = notesController.text;
 
     final _parsedAmount = double.tryParse(_amountText);
@@ -439,11 +437,27 @@ class _FormScreenState extends State<FormScreen> {
     final _model = TransactionModel(
       amount: _parsedAmount!,
       date: _date!,
-      type: _selectedCategorytype!,
-      category: _selectedCategoryModel!,
+      type: Provider.of<FromScreenProvider>(context, listen: false)
+          .selectedCategorytype!,
+      category: Provider.of<FromScreenProvider>(context, listen: false)
+          .selectedCategoryModel!,
       notes: _notes,
     );
 
     TransactionDB.instance.addTransaction(_model);
   }
 }
+
+ValueNotifier<CategoryType> selectedCategoryNotifier =
+    ValueNotifier(CategoryType.income);
+
+ValueNotifier<List<TransactionModel>> transactions =
+    TransactionDB.instance.transactionListNotifier;
+
+List<CategoryModel> incCategories =
+    CategoryDB.instance.incomeCategoryListNotifier.value;
+
+List<CategoryModel> expCategories =
+    CategoryDB.instance.expenseCategoryListNotifier.value;
+
+final _formKey = GlobalKey<FormState>();

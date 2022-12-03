@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:money_manager/application/category_screen_provider.dart';
+import 'package:money_manager/application/formScreenProvider.dart';
+import 'package:money_manager/application/home_provider.dart';
 import 'package:money_manager/screens/splash_screen.dart';
 import 'package:money_manager/transaction_model/transaction_model.dart';
+import 'package:provider/provider.dart';
 import 'catagory_model/category_model.dart';
 
 Future<void> main() async {
@@ -33,10 +37,23 @@ class MyApp extends StatelessWidget {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    return MaterialApp(
-      theme: ThemeData(primarySwatch: Colors.blueGrey),
-      debugShowCheckedModeBanner: false,
-      home: const SplashScreen(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: ((context) => HomeProvider()),
+        ),
+        ChangeNotifierProvider(
+          create: ((context) => CategoryScreenProvider()),
+        ),
+        ChangeNotifierProvider(
+          create: ((context) => FromScreenProvider()),
+        ),
+      ],
+      child: MaterialApp(
+        theme: ThemeData(primarySwatch: Colors.blueGrey),
+        debugShowCheckedModeBanner: false,
+        home: const SplashScreen(),
+      ),
     );
   }
 }
