@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:money_manager/screens/transaction_screen/transaction_screen.dart';
 import 'package:money_manager/transaction_model/transaction_model.dart';
+import '../../application/transaction_screen_provider.dart';
 import '../../catagory_model/category_model.dart';
 
 const transactionDbName = 'transaction-db';
@@ -182,8 +183,16 @@ class TransactionDB implements TransactionDbFunctions {
     await Future.forEach(
       _list,
       (TransactionModel transaction) {
-        if (transaction.date.isAfter(startDate.subtract(Duration(days: 1))) &&
-            transaction.date.isBefore(endDate.add(Duration(days: 1)))) {
+        if (transaction.date.isAfter(
+              startDate.subtract(
+                Duration(days: 1),
+              ),
+            ) &&
+            transaction.date.isBefore(
+              endDate.add(
+                Duration(days: 1),
+              ),
+            )) {
           dateRangeList.value.add(transaction);
         } else {
           return;

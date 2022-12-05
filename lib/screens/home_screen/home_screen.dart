@@ -54,7 +54,7 @@ class HomeScreen extends StatelessWidget {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: ((context) {
-                                return const TransactionScreen();
+                                return TransactionScreen();
                               }),
                             ),
                           );

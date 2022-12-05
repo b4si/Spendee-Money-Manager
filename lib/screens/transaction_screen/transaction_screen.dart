@@ -1,33 +1,22 @@
-// ignore_for_file: unused_local_variable, override_on_non_overriding_member, unused_field
+// ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:money_manager/application/transaction_screen_provider.dart';
+import 'package:provider/provider.dart';
 import '../../catagory_model/category_model.dart';
 import '../../db/transaction_db/transaction_db.dart';
 import '../../transaction_model/transaction_model.dart';
 
-class TransactionScreen extends StatefulWidget {
-  const TransactionScreen({super.key});
+class TransactionScreen extends StatelessWidget {
+  TransactionScreen({super.key});
 
-  @override
-  State<TransactionScreen> createState() => TransactionScreenState();
-}
-
-class TransactionScreenState extends State<TransactionScreen> {
   List<TransactionModel> transactions =
       TransactionDB.instance.transactionListNotifier.value;
 
-  List<TransactionModel> foundTransactions = [];
-
-  @override
-  void initState() {
-    foundTransactions = transactions;
-    super.initState();
-  }
-
   //Search Function------->
 
-  void runFilter(String enteredKeyword) {
+  void runFilter(String enteredKeyword, context) {
     List<TransactionModel> results = [];
     if (enteredKeyword.isEmpty) {
       results = transactions;
@@ -40,30 +29,18 @@ class TransactionScreenState extends State<TransactionScreen> {
           )
           .toList();
     }
-    setState(() {
-      foundTransactions = results;
-    });
+    Provider.of<TransactionScreenProvider>(context, listen: false)
+        .searchResult(results);
   }
 
-  @override
-  final TextEditingController _searchController = TextEditingController();
-  String? selectedItem;
-  int? _value1;
-  int _value2 = 1;
-  int? _value3;
-  int _value4 = 1;
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         actions: [
           IconButton(
             onPressed: () {
-              setState(() {
-                pickDateRange().whenComplete(() => foundTransactions =
-                    TransactionDB.instance.dateRangeList.value);
-              });
+              Provider.of<TransactionScreenProvider>(context, listen: false)
+                  .pickDateRangeValue(context);
             },
             icon: const Icon(
               Icons.calendar_month,
@@ -82,70 +59,46 @@ class TransactionScreenState extends State<TransactionScreen> {
 
               //Dropdown button for all,income,expense------->
 
-              child: DropdownButton(
-                elevation: 1,
-                borderRadius: BorderRadius.circular(18),
-                dropdownColor: Colors.blueGrey[100],
-                underline: Container(),
-                value: _value4,
-                items: [
-                  DropdownMenuItem(
-                    value: 1,
-                    child: const Text('All'),
-                    onTap: () {
-                      setState(() {
-                        if (_value2 == 1) {
-                          foundTransactions = transactions;
-                        } else if (_value2 == 2) {
-                          foundTransactions = TransactionDB
-                              .instance.todayTransactionNotifier.value;
-                        } else if (_value2 == 3) {
-                          foundTransactions = TransactionDB
-                              .instance.monthlyTransactionNotifier.value;
-                        }
-                      });
-                    },
-                  ),
-                  DropdownMenuItem(
-                    value: 2,
-                    child: const Text('Income'),
-                    onTap: () {
-                      setState(() {
-                        if (_value2 == 1) {
-                          foundTransactions = TransactionDB
-                              .instance.incomeTransactionNotifier.value;
-                        } else if (_value2 == 2) {
-                          foundTransactions =
-                              TransactionDB.instance.todayIncomeList.value;
-                        } else if (_value2 == 3) {
-                          foundTransactions = TransactionDB
-                              .instance.allMonthlyincomeTransactions.value;
-                        }
-                      });
-                    },
-                  ),
-                  DropdownMenuItem(
-                    value: 3,
-                    child: const Text('Expense'),
-                    onTap: () {
-                      setState(() {
-                        if (_value2 == 1) {
-                          foundTransactions = TransactionDB
-                              .instance.expenseTransactionNotifier.value;
-                        } else if (_value2 == 2) {
-                          foundTransactions =
-                              TransactionDB.instance.todayExpenseList.value;
-                        } else if (_value2 == 3) {
-                          foundTransactions = TransactionDB
-                              .instance.allMonthlyExpenseTransactions.value;
-                        }
-                      });
-                    },
-                  ),
-                ],
-                onChanged: ((value) {
-                  _value4 = value!;
-                }),
+              child: Consumer<TransactionScreenProvider>(
+                builder: (context, value, child) => DropdownButton(
+                  elevation: 1,
+                  borderRadius: BorderRadius.circular(18),
+                  dropdownColor: Colors.blueGrey[100],
+                  underline: Container(),
+                  value: value.value4,
+                  items: [
+                    DropdownMenuItem(
+                      value: 1,
+                      child: const Text('All'),
+                      onTap: () {
+                        Provider.of<TransactionScreenProvider>(context,
+                                listen: false)
+                            .checkAllTransaction(value.value2);
+                      },
+                    ),
+                    DropdownMenuItem(
+                      value: 2,
+                      child: const Text('Income'),
+                      onTap: () {
+                        Provider.of<TransactionScreenProvider>(context,
+                                listen: false)
+                            .checkIncomeTransaction(value.value2);
+                      },
+                    ),
+                    DropdownMenuItem(
+                      value: 3,
+                      child: const Text('Expense'),
+                      onTap: () {
+                        Provider.of<TransactionScreenProvider>(context,
+                                listen: false)
+                            .checkExpenseTransaction(value.value2);
+                      },
+                    ),
+                  ],
+                  onChanged: ((gettingValue) {
+                    value.dropDownOnchange1(gettingValue!);
+                  }),
+                ),
               ),
             ),
             trailing: Padding(
@@ -153,74 +106,48 @@ class TransactionScreenState extends State<TransactionScreen> {
 
               //Dropdown Button for all,today,monthly----->
 
-              child: DropdownButton(
-                elevation: 1,
-                dropdownColor: Colors.blueGrey[100],
-                borderRadius: BorderRadius.circular(18),
-                underline: Container(),
-                value: _value2,
-                items: [
-                  DropdownMenuItem(
-                    value: 1,
-                    child: const Text('All'),
-                    onTap: () {
-                      setState(() {
-                        if (_value4 == 1) {
-                          foundTransactions = transactions;
-                        } else if (_value4 == 2) {
-                          foundTransactions = TransactionDB
-                              .instance.incomeTransactionNotifier.value;
-                        } else if (_value4 == 3) {
-                          foundTransactions = TransactionDB
-                              .instance.expenseTransactionNotifier.value;
-                        }
-                      });
-                    },
-                  ),
-                  DropdownMenuItem(
-                    value: 2,
-                    child: const Text('Today'),
-                    onTap: () {
-                      setState(() {
-                        if (_value4 == 1) {
-                          foundTransactions = TransactionDB
-                              .instance.todayTransactionNotifier.value;
-                        } else if (_value4 == 2) {
-                          foundTransactions =
-                              TransactionDB.instance.todayIncomeList.value;
-                        } else if (_value4 == 3) {
-                          foundTransactions =
-                              TransactionDB.instance.todayExpenseList.value;
-                        }
-                      });
-                    },
-                  ),
-                  DropdownMenuItem(
-                    value: 3,
-                    child: const Text(
-                      'Monthly',
+              child: Consumer<TransactionScreenProvider>(
+                builder: (context, value, child) => DropdownButton(
+                  elevation: 1,
+                  dropdownColor: Colors.blueGrey[100],
+                  borderRadius: BorderRadius.circular(18),
+                  underline: Container(),
+                  value: value.value2,
+                  items: [
+                    DropdownMenuItem(
+                      value: 1,
+                      child: const Text('All'),
+                      onTap: () {
+                        Provider.of<TransactionScreenProvider>(context,
+                                listen: false)
+                            .checkAllTransaction2(value.value4);
+                      },
                     ),
-                    onTap: () {
-                      setState(() {
-                        if (_value4 == 1) {
-                          foundTransactions = TransactionDB
-                              .instance.monthlyTransactionNotifier.value;
-                        } else if (_value4 == 2) {
-                          foundTransactions = TransactionDB
-                              .instance.allMonthlyincomeTransactions.value;
-                        } else if (_value4 == 3) {
-                          foundTransactions = TransactionDB
-                              .instance.allMonthlyExpenseTransactions.value;
-                        }
-                      });
-                    },
-                  ),
-                ],
-                onChanged: ((value) {
-                  setState(() {
-                    _value2 = value!;
-                  });
-                }),
+                    DropdownMenuItem(
+                      value: 2,
+                      child: const Text('Today'),
+                      onTap: () {
+                        Provider.of<TransactionScreenProvider>(context,
+                                listen: false)
+                            .todayTransactionList(value.value4);
+                      },
+                    ),
+                    DropdownMenuItem(
+                      value: 3,
+                      child: const Text(
+                        'Monthly',
+                      ),
+                      onTap: () {
+                        Provider.of<TransactionScreenProvider>(context,
+                                listen: false)
+                            .monthlyTransactionList(value.value4);
+                      },
+                    ),
+                  ],
+                  onChanged: ((gettingValue) {
+                    value.dropDownOnchange2(gettingValue!);
+                  }),
+                ),
               ),
             ),
           ),
@@ -235,7 +162,7 @@ class TransactionScreenState extends State<TransactionScreen> {
                   child: SizedBox(
                     height: 50,
                     child: TextFormField(
-                      onChanged: ((value) => runFilter(value)),
+                      onChanged: ((value) => runFilter(value, context)),
                       decoration: InputDecoration(
                         hintText: 'Search',
                         suffixIcon: const Icon(Icons.search),
@@ -246,114 +173,106 @@ class TransactionScreenState extends State<TransactionScreen> {
                     ),
                   ),
                 ),
-                Expanded(
-                  child: foundTransactions.isEmpty
-                      ? Center(
-                          child: Text(
-                            'Transaction Not found',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                        )
-                      : ValueListenableBuilder(
-                          valueListenable:
-                              TransactionDB.instance.transactionListNotifier,
-                          builder: (BuildContext context,
-                              List<TransactionModel> newList, _) {
-                            return ListView.separated(
-                              itemBuilder: ((context, index) {
-                                final transactionList =
-                                    foundTransactions[index];
-                                return Slidable(
-                                  key: Key(transactionList.id!),
-                                  startActionPane: ActionPane(
-                                      motion: const StretchMotion(),
-                                      children: [
-                                        SlidableAction(
-                                          onPressed: (ctx) {
-                                            setState(() {
-                                              TransactionDB.instance
-                                                  .deleteTransaction(
-                                                      transactionList.id!);
-                                            });
-                                          },
-                                          backgroundColor: Colors.red,
-                                          icon: Icons.delete,
-                                          label: "Delete",
-                                        ),
-                                      ]),
-                                  child: ListTile(
-                                    onTap: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: ((context) {
-                                          return SimpleDialog(
-                                            contentPadding:
-                                                const EdgeInsets.all(18),
-                                            title: const Text('Details'),
-                                            children: [
-                                              Text(
-                                                'Category : ${transactionList.category.name}',
-                                              ),
-                                              const SizedBox(
-                                                height: 10,
-                                              ),
-                                              Text(
-                                                'Amount   : ${transactionList.amount}',
-                                              ),
-                                              const SizedBox(
-                                                height: 10,
-                                              ),
-                                              Text(
-                                                'Date         : ${parseDate(
-                                                  transactionList.date,
-                                                )}',
-                                              ),
-                                              const SizedBox(
-                                                height: 10,
-                                              ),
-                                              Text(
-                                                'Notes       : ${transactionList.notes}',
-                                              ),
-                                            ],
-                                          );
-                                        }),
-                                      );
-                                    },
-                                    title: Text(transactionList.category.name),
-                                    subtitle: Text(
-                                      parseDate(transactionList.date),
-                                    ),
-                                    trailing: transactionList.type ==
-                                            CategoryType.income
-                                        ? Text(
-                                            '₹${transactionList.amount.toString()}',
-                                            style: const TextStyle(
-                                              color: Colors.green,
+                Consumer<TransactionScreenProvider>(
+                  builder: (context, value, child) => Expanded(
+                    child: transactions.isEmpty
+                        ? Center(
+                            child: Text(
+                              'Transaction Not found',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          )
+                        : ListView.separated(
+                            itemBuilder: ((context, index) {
+                              final transactionList =
+                                  value.foundTransactions[index];
+                              return Slidable(
+                                key: Key(transactionList.id!),
+                                startActionPane: ActionPane(
+                                    motion: const StretchMotion(),
+                                    children: [
+                                      SlidableAction(
+                                        onPressed: (ctx) {
+                                          value.deleteTransaction(
+                                              transactionList.id!);
+                                        },
+                                        backgroundColor: Colors.red,
+                                        icon: Icons.delete,
+                                        label: "Delete",
+                                      ),
+                                    ]),
+                                child: ListTile(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: ((context) {
+                                        return SimpleDialog(
+                                          contentPadding:
+                                              const EdgeInsets.all(18),
+                                          title: const Text('Details'),
+                                          children: [
+                                            Text(
+                                              'Category : ${transactionList.category.name}',
                                             ),
-                                          )
-                                        : Text(
-                                            '₹${transactionList.amount.toString()}',
-                                            style: const TextStyle(
-                                              color: Colors.red,
+                                            const SizedBox(
+                                              height: 10,
                                             ),
+                                            Text(
+                                              'Amount   : ${transactionList.amount}',
+                                            ),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            Text(
+                                              'Date         : ${parseDate(
+                                                transactionList.date,
+                                              )}',
+                                            ),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            Text(
+                                              'Notes       : ${transactionList.notes}',
+                                            ),
+                                          ],
+                                        );
+                                      }),
+                                    );
+                                  },
+                                  title: Text(transactionList.category.name),
+                                  subtitle: Text(
+                                    parseDate(transactionList.date),
+                                  ),
+                                  trailing: transactionList.type ==
+                                          CategoryType.income
+                                      ? Text(
+                                          '₹${transactionList.amount.toString()}',
+                                          style: const TextStyle(
+                                            color: Colors.green,
                                           ),
-                                  ),
-                                );
-                              }),
-                              separatorBuilder: (context, index) {
-                                return const Padding(
-                                  padding: EdgeInsets.only(right: 15, left: 15),
-                                  child: Divider(
-                                    thickness: 1,
-                                    color: Colors.grey,
-                                  ),
-                                );
-                              },
-                              itemCount: foundTransactions.length,
-                            );
-                          },
-                        ),
+                                        )
+                                      : Text(
+                                          '₹${transactionList.amount.toString()}',
+                                          style: const TextStyle(
+                                            color: Colors.red,
+                                          ),
+                                        ),
+                                ),
+                              );
+                            }),
+                            separatorBuilder: (context, index) {
+                              return const Padding(
+                                padding: EdgeInsets.only(right: 15, left: 15),
+                                child: Divider(
+                                  thickness: 1,
+                                  color: Colors.grey,
+                                ),
+                              );
+                            },
+                            itemCount: value.foundTransactions.length,
+                          ),
+                  ),
                 ),
               ],
             ),
@@ -362,25 +281,7 @@ class TransactionScreenState extends State<TransactionScreen> {
       ),
     );
   }
-
-  Future pickDateRange() async {
-    DateTimeRange? newDateRange = await showDateRangePicker(
-      context: context,
-      firstDate: DateTime(2021),
-      lastDate: DateTime(2050),
-    );
-
-    if (newDateRange == null) {
-      return;
-    } else {
-      startDate = await newDateRange.start;
-      endDate = await newDateRange.end;
-    }
-  }
 }
-
-DateTime startDate = DateTime.now();
-DateTime endDate = DateTime.now();
 
 String parseDate(DateTime date) {
   return '${date.day}/${date.month}/${date.year}';

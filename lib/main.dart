@@ -4,6 +4,8 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:money_manager/application/category_screen_provider.dart';
 import 'package:money_manager/application/formScreenProvider.dart';
 import 'package:money_manager/application/home_provider.dart';
+import 'package:money_manager/application/statics_screen_provider.dart';
+import 'package:money_manager/application/transaction_screen_provider.dart';
 import 'package:money_manager/screens/splash_screen.dart';
 import 'package:money_manager/transaction_model/transaction_model.dart';
 import 'package:provider/provider.dart';
@@ -47,6 +49,12 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: ((context) => FromScreenProvider()),
+        ),
+        ChangeNotifierProvider(
+          create: ((context) => TransactionScreenProvider()),
+        ),
+        ChangeNotifierProvider(
+          create: ((context) => StaticsScreenProvider()),
         ),
       ],
       child: MaterialApp(
