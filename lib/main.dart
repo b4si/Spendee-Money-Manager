@@ -4,7 +4,9 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:money_manager/application/category_screen_provider.dart';
 import 'package:money_manager/application/formScreenProvider.dart';
 import 'package:money_manager/application/home_provider.dart';
-import 'package:money_manager/application/statics_screen_provider.dart';
+import 'package:money_manager/application/statics_screen_provider/all_statics_provider.dart';
+import 'package:money_manager/application/statics_screen_provider/expense_statics_provider.dart';
+import 'package:money_manager/application/statics_screen_provider/income_statics_provider.dart';
 import 'package:money_manager/application/transaction_screen_provider.dart';
 import 'package:money_manager/screens/splash_screen.dart';
 import 'package:money_manager/transaction_model/transaction_model.dart';
@@ -54,7 +56,13 @@ class MyApp extends StatelessWidget {
           create: ((context) => TransactionScreenProvider()),
         ),
         ChangeNotifierProvider(
-          create: ((context) => StaticsScreenProvider()),
+          create: ((context) => ExpenseStaticsProvider()),
+        ),
+        ChangeNotifierProvider(
+          create: ((context) => IncomeStaticsProvider()),
+        ),
+        ChangeNotifierProvider(
+          create: ((context) => AllStaticsProvider()),
         ),
       ],
       child: MaterialApp(

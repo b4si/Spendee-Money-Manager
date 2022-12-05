@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:money_manager/application/home_provider.dart';
 import 'package:money_manager/db/category_db/category_db.dart';
@@ -9,15 +11,11 @@ import 'package:money_manager/screens/settings_screen/settings_screen.dart';
 import 'package:money_manager/screens/statics_screen/statics_screen.dart';
 import 'package:money_manager/screens/transaction_screen/transaction_screen.dart';
 import 'package:provider/provider.dart';
-import '../../transaction_model/transaction_model.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
 
   PageController pageController = PageController();
-
-  List<TransactionModel> transactions =
-      TransactionDB.instance.transactionListNotifier.value;
 
   @override
   Widget build(BuildContext context) {

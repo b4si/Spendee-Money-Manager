@@ -40,7 +40,7 @@ class _StaticsScreenState extends State<StaticsScreen>
         SizedBox(
           width: double.infinity,
           height: 500,
-          child: TabBarView(controller: newTabcontroller, children: const [
+          child: TabBarView(controller: newTabcontroller, children: [
             PieCahrt(),
             AllIncomeChart(),
             AllExpenseChart(),

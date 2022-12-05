@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../db/transaction_db/transaction_db.dart';
-import '../transaction_model/transaction_model.dart';
+import '../../db/transaction_db/transaction_db.dart';
+import '../../transaction_model/transaction_model.dart';
 
-class StaticsScreenProvider with ChangeNotifier {
+class ExpenseStaticsProvider with ChangeNotifier {
   List<TransactionModel> temp =
       TransactionDB.instance.allMonthlyExpenseTransactions.value;
 

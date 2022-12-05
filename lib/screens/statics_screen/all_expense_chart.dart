@@ -1,6 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:money_manager/application/statics_screen_provider.dart';
+import 'package:money_manager/application/statics_screen_provider/expense_statics_provider.dart';
 import 'package:provider/provider.dart';
 
 class AllExpenseChart extends StatelessWidget {
@@ -12,7 +12,7 @@ class AllExpenseChart extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Consumer<StaticsScreenProvider>(
+          Consumer<ExpenseStaticsProvider>(
             builder: (context, value, child) => DropdownButton(
               elevation: 1,
               dropdownColor: Colors.blueGrey[100],
@@ -23,7 +23,7 @@ class AllExpenseChart extends StatelessWidget {
                 DropdownMenuItem(
                   value: 0,
                   onTap: () {
-                    Provider.of<StaticsScreenProvider>(context, listen: false)
+                    Provider.of<ExpenseStaticsProvider>(context, listen: false)
                         .MonthlyTranscation();
                   },
                   child: const Text(
@@ -34,7 +34,7 @@ class AllExpenseChart extends StatelessWidget {
                 DropdownMenuItem(
                   value: 1,
                   onTap: () {
-                    Provider.of<StaticsScreenProvider>(context, listen: false)
+                    Provider.of<ExpenseStaticsProvider>(context, listen: false)
                         .AnuallyTranscation();
                   },
                   child: const Text(
@@ -48,7 +48,7 @@ class AllExpenseChart extends StatelessWidget {
               },
             ),
           ),
-          Consumer<StaticsScreenProvider>(
+          Consumer<ExpenseStaticsProvider>(
             builder: (context, value, child) => Container(
               height: 420,
               decoration: BoxDecoration(
@@ -85,7 +85,7 @@ class AllExpenseChart extends StatelessWidget {
                             spots: [
                               for (int i = 0; i < value.temp.length; i++)
                                 FlSpot(
-                                  Provider.of<StaticsScreenProvider>(context)
+                                  Provider.of<ExpenseStaticsProvider>(context)
                                               .value1 ==
                                           0
                                       ? value.temp[i].date.day.toDouble()
